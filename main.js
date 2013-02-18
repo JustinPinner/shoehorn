@@ -140,19 +140,18 @@
     sys.renderer = Renderer("#viewport") // our newly created renderer will have its .init() method called shortly by sys...
 
       $.getJSON('data/shoehorn-multi.json', function(data) {
-            var output="<ul>";
             for (var i in data) {
                 sys.addNode(data[i].id, {root: true, label: data[i].headline, links: data[i].links});                
-                output+="<li>" + data[i].id + " " + data[i].headline                
                 for (var l in data[i].links) {
-                    output+= "<li>" + data[i].links[l].id + "</li>"; 
+                    var node = sys.getNode(data[i].links[l].id);
+                    if (node) {
+                        sys.addEdge(data[i].id, node, {length: data[i].links[l].length});
+                    }                    
                 }
-                output+= + "</li>";
             }
-
-            output+="</ul>";
-            
       });
+
+        
 
 //    for(x=0; x<json.length; x++){
 //        node = json(x)
