@@ -75,7 +75,7 @@
           // draw circle
           ctx.fillStyle = isRoot ? "red" : circleColour;
           ctx.beginPath();
-          ctx.arc(pt.x-w/2, pt.y-w/2, node.data.links.length * 10, 0, Math.PI*2, true);
+          ctx.arc(pt.x-w/2, pt.y-w/2, 10 + node.data.weight * 5, 0, Math.PI*2, true);
           ctx.closePath();
           ctx.fill();
 
@@ -149,8 +149,7 @@
 
       $.getJSON("http://gnm41162:8888/?ignore=type,tone&ignore-section-tags=true&callback=?", function(data) {
             for (var i in data.nodes) {
-                var links = data.nodes[i].links.length;
-                sys.addNode(data.nodes[i].id, {root:(i == 0), weight:links, label:data.nodes[i].webTitle, links:data.nodes[i].links});
+                sys.addNode(data.nodes[i].id, {root:(i == 0), weight:data.nodes[i].weight, label:data.nodes[i].webTitle, links:data.nodes[i].links});
                 for (var l in data.nodes[i].links) {
                     var node = sys.getNode(data.nodes[i].links[l].id);
                     if (node) {
