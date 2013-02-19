@@ -27,15 +27,15 @@
         // inform the system of the screen dimensions so it can map coords for us.
         // if the canvas is ever resized, screenSize should be called again with
         // the new dimensions
-        particleSystem.screenSize(canvas.width, canvas.height) 
+        particleSystem.screenSize(canvas.width, canvas.height)
         particleSystem.screenPadding(80) // leave an extra 80px of whitespace per side
-        
+
         // set up some event handlers to allow for node-dragging
         that.initMouseHandling()
       },
-      
+
       redraw:function(){
-        // 
+        //
         // redraw will be called repeatedly during the run whenever the node positions
         // change. the new positions for the nodes can be accessed by looking at the
         // .p attribute of a given node. however the p.x & p.y values are in the coordinates
@@ -43,10 +43,10 @@
         // the screen yourself, or use the convenience iterators .eachNode (and .eachEdge)
         // which allow you to step through the actual node objects but also pass an
         // x,y point in the screen's coordinate system
-        // 
+        //
         ctx.fillStyle = "white"
         ctx.fillRect(0,0, canvas.width, canvas.height)
-        
+
         particleSystem.eachEdge(function(edge, pt1, pt2){
           // edge: {source:Node, target:Node, length:#, data:{}}
           // pt1:  {x:#, y:#}  source position in screen coords
@@ -67,19 +67,25 @@
 
           // draw a rectangle centered at pt
           var w = 10
-          var color = (node.data.alone) ? "orange" : (node.data.root) ? "red" : (node.data.color) ? node.data.color : "black"
-          ctx.fillStyle = color
-          var label = node.data.label || ""          
-          if (label){
-            ctx.font = "16px Helvetica"
-            ctx.fillStyle = color            
-            ctx.fillText(label, pt.x-w/2, pt.y-w/2)
-          } else {
-            ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)
-          }
-        })    			
+          var circleColour = "lightgrey"
+          var textColour = "black";
+          var label = node.data.label || ""
+
+          // draw circle
+          ctx.fillStyle = circleColour;
+          ctx.beginPath();
+          ctx.arc(pt.x-w/2, pt.y-w/2, node.data.links.length * 10, 0, Math.PI*2, true);
+          ctx.closePath();
+          ctx.fill();
+
+          // draw label
+          ctx.fillStyle = textColour;
+          ctx.font = "16px Helvetica"
+          ctx.fillStyle = textColour
+          ctx.fillText(label, pt.x-w/2, pt.y-w/2)
+        })
       },
-      
+
       initMouseHandling:function(){
         // no-nonsense drag and drop (thanks springy.js)
         var dragged = null;
@@ -125,15 +131,15 @@
             return false
           }
         }
-        
+
         // start listening
         $(canvas).mousedown(handler.clicked);
 
       },
-      
+
     }
     return that
-  }    
+  }
 
   $(document).ready(function(){
     var sys = arbor.ParticleSystem(1000, 600, 0.5) // create the system with sensible repulsion/stiffness/friction
@@ -142,12 +148,12 @@
 
       $.getJSON("http://gnm41162:8888/?ignore=type,tone&ignore-section-tags=true&callback=?", function(data) {
             for (var i in data.nodes) {
-                 sys.addNode(data.nodes[i].id, {root:(i == 0), label:data.nodes[i].webTitle, links:data.nodes[i].links});                
+                 sys.addNode(data.nodes[i].id, {root:(i == 0), label:data.nodes[i].webTitle, links:data.nodes[i].links});
                 for (var l in data.nodes[i].links) {
                     var node = sys.getNode(data.nodes[i].links[l].id);
                     if (node) {
                         sys.addEdge(data.nodes[i].id, node, {length: data.nodes[i].links[l].length});
-                    }                    
+                    }
                 }
             }
       });
