@@ -53,7 +53,7 @@
           // pt2:  {x:#, y:#}  target position in screen coords
 
           // draw a line from pt1 to pt2
-          ctx.strokeStyle = "rgba(0,0,0, .333)"
+          ctx.strokeStyle = "rgba(50,50,50, .333)"
           ctx.lineWidth = 1
           ctx.beginPath()
           ctx.moveTo(pt1.x, pt1.y)
