@@ -71,7 +71,7 @@
           ctx.fillStyle = color
           var label = node.data.label || ""          
           if (label){
-            ctx.font = (10 + ((node.data.weight) ? node.data.weight : 8)) + "px Helvetica"
+            ctx.font = (12 + ((node.data.weight) ? node.data.weight : 0)) + "px Helvetica"
             ctx.fillStyle = color            
             ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)            
             ctx.fillText(label, pt.x-w/2, pt.y-w/2)
