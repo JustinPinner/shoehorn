@@ -64,15 +64,16 @@
         particleSystem.eachNode(function(node, pt){
           // node: {mass:#, p:{x,y}, name:"", data:{}}
           // pt:   {x:#, y:#}  node position in screen coords
+          var isRoot = node.data.root
 
           // draw a rectangle centered at pt
           var w = 10
           var circleColour = "lightgrey"
-          var textColour = "black";
+          var textColour = "black"
           var label = node.data.label || ""
 
           // draw circle
-          ctx.fillStyle = circleColour;
+          ctx.fillStyle = isRoot ? "red" : circleColour;
           ctx.beginPath();
           ctx.arc(pt.x-w/2, pt.y-w/2, node.data.links.length * 10, 0, Math.PI*2, true);
           ctx.closePath();
@@ -80,7 +81,7 @@
 
           // draw label
           ctx.fillStyle = textColour;
-          ctx.font = "16px Helvetica"
+          ctx.font = (12 + ((node.data.weight) ? node.data.weight : 0)) + "px Helvetica"
           ctx.fillStyle = textColour
           ctx.fillText(label, pt.x-w/2, pt.y-w/2)
         })
@@ -148,13 +149,15 @@
 
       $.getJSON("http://gnm41162:8888/?ignore=type,tone&ignore-section-tags=true&callback=?", function(data) {
             for (var i in data.nodes) {
-                 sys.addNode(data.nodes[i].id, {root:(i == 0), label:data.nodes[i].webTitle, links:data.nodes[i].links});
+                var links = data.nodes[i].links.length;
+                sys.addNode(data.nodes[i].id, {root:(i == 0), weight:links, label:data.nodes[i].webTitle, links:data.nodes[i].links});
                 for (var l in data.nodes[i].links) {
                     var node = sys.getNode(data.nodes[i].links[l].id);
                     if (node) {
                         sys.addEdge(data.nodes[i].id, node, {length: data.nodes[i].links[l].length});
                     }
                 }
+
             }
       });
   })
