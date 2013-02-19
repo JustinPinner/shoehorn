@@ -136,11 +136,11 @@
   }    
 
   $(document).ready(function(){
-    var sys = arbor.ParticleSystem(500, 600, 0.5) // create the system with sensible repulsion/stiffness/friction
+    var sys = arbor.ParticleSystem(1000, 600, 0.5) // create the system with sensible repulsion/stiffness/friction
     sys.parameters({gravity:true}) // use center-gravity to make the graph settle nicely (ymmv)
     sys.renderer = Renderer("#viewport") // our newly created renderer will have its .init() method called shortly by sys...
 
-      $.getJSON("http://gnm41162:8888/?ignore=type,tone,world/world,technology/technology,uk/uk,culture/culture&callback=?", function(data) {
+      $.getJSON("http://gnm41162:8888/?ignore=type,tone&ignore-section-tags=true&callback=?", function(data) {
             for (var i in data.nodes) {
                  sys.addNode(data.nodes[i].id, {root:(i == 0), label:data.nodes[i].webTitle, links:data.nodes[i].links});                
                 for (var l in data.nodes[i].links) {
