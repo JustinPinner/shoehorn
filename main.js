@@ -4,6 +4,8 @@
 //  A project template for using arbor.js
 //
 
+// Added click (url link) support thanks to: http://xairinc.nixiweb.com/arbolnuevo/scripts/renderer.js
+
 String.prototype.trim = function(len) {
   if ((this.length) > len) {
     return this.substring(0, len - 1) + "…";
@@ -83,7 +85,7 @@ String.prototype.trim = function(len) {
           // draw circle
           ctx.fillStyle = isRoot ? "red" : circleColour;
           ctx.beginPath();
-          ctx.arc(pt.x-w/2, pt.y-w/2, 10 + node.data.weight * 5, 0, Math.PI*2, true);
+          ctx.arc(pt.x-w/2, pt.y-w/2, 5 + node.data.weight * 3, 0, Math.PI*2, true);
           ctx.closePath();
           ctx.fill();
 
@@ -105,16 +107,14 @@ String.prototype.trim = function(len) {
           clicked:function(e){
             var pos = $(canvas).offset();
             _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-            dragged = particleSystem.nearest(_mouseP);
+            selected = nearest = dragged = particleSystem.nearest(_mouseP);
 
-            if (dragged && dragged.node !== null){
-              // while we're dragging, don't let physics move the node
-              dragged.node.fixed = true
-            }
+            if (dragged.node !== null) dragged.node.fixed = true
 
-            $(canvas).bind('mousemove', handler.dragged)
-            $(window).bind('mouseup', handler.dropped)
-
+            $(canvas).bind('mousemove', handler.dragged)//le indica que puede arrastrarlo
+            $(window).bind('mouseup', handler.dropped)//le indica que puede soltarlo, evento draganddrop
+            $(canvas).bind('mouseup', handler.doubleclicked)//caso de que se haga dobleclic
+            
             return false
           },
           dragged:function(e){
@@ -125,10 +125,9 @@ String.prototype.trim = function(len) {
               var p = particleSystem.fromScreen(s)
               dragged.node.p = p
             }
-
+            $(canvas).unbind('mouseup', handler.doubleclicked)
             return false
           },
-
           dropped:function(e){
             if (dragged===null || dragged.node===undefined) return
             if (dragged.node !== null) dragged.node.fixed = false
@@ -136,8 +135,29 @@ String.prototype.trim = function(len) {
             dragged = null
             $(canvas).unbind('mousemove', handler.dragged)
             $(window).unbind('mouseup', handler.dropped)
+            $(canvas).unbind('mouseup', handler.doubleclicked)
             _mouseP = null
             return false
+          },
+          doubleclicked:function(e){
+          //caso de que se haga dobleclic, maneja el evento clic para mostrar los nodos hijos
+         	if (dragged===null || dragged.node===undefined) return
+
+          	if (dragged.node !== null){
+           		dragged.node.fixed = false
+           		var id=dragged.node.name;           		
+       			document.getElementById("tempBox").innerHTML = 'gu.com/'+ id;
+                window.open('http://gu.com/'+ id,"_blank")                
+      		}//nodo diferente de null
+          		
+      		//dragged = null
+        	selected = null
+        	$(canvas).unbind('mousemove', handler.dragged)
+        	$(window).unbind('mouseup', handler.dropped)
+        	$(canvas).unbind('mouseup', handler.doubleclicked)
+        	_mouseP = null
+        	
+      		return false
           }
         }
 
@@ -151,11 +171,12 @@ String.prototype.trim = function(len) {
   }
 
   $(document).ready(function(){
-    var sys = arbor.ParticleSystem(1000, 600, 0.5) // create the system with sensible repulsion/stiffness/friction
+    var sys = arbor.ParticleSystem(3500, 600, 0.5) // create the system with sensible repulsion/stiffness/friction
     sys.parameters({gravity:true}) // use center-gravity to make the graph settle nicely (ymmv)
     sys.renderer = Renderer("#viewport") // our newly created renderer will have its .init() method called shortly by sys...
 
-      $.getJSON("http://gnm41162:8888/?ignore=type,tone,publication&ignore-section-tags=true&callback=?", function(data) {
+        $.getJSON("http://gnm41162:8888/?ignore=type,tone,publication&ignore-section-tags=true&callback=?", function(data) {
+        //$.getJSON("data/cache.json", function(data) {
             for (var i in data.nodes) {
                 sys.addNode(data.nodes[i].id, {root:(i == 0), weight:data.nodes[i].weight, label:data.nodes[i].webTitle, links:data.nodes[i].links});
                 for (var l in data.nodes[i].links) {
