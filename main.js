@@ -4,6 +4,14 @@
 //  A project template for using arbor.js
 //
 
+String.prototype.trim = function(len) {
+  if ((this.length) > len) {
+    return this.substring(0, len - 1) + "…";
+  } else {
+    return this;
+  }
+};
+
 (function($){
 
   var Renderer = function(canvas){
@@ -83,7 +91,7 @@
           ctx.fillStyle = textColour;
           ctx.font = (12 + ((node.data.weight) ? node.data.weight : 0)) + "px Helvetica"
           ctx.fillStyle = textColour
-          ctx.fillText(label, pt.x-w/2, pt.y-w/2)
+          ctx.fillText(label.trim(50), pt.x-w/2, pt.y-w/2)
         })
       },
 
