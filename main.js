@@ -71,8 +71,9 @@
           ctx.fillStyle = color
           var label = node.data.label || ""          
           if (label){
-            ctx.font = "16px Helvetica"
+            ctx.font = (10 + ((node.data.weight) ? node.data.weight : 8)) + "px Helvetica"
             ctx.fillStyle = color            
+            ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)            
             ctx.fillText(label, pt.x-w/2, pt.y-w/2)
           } else {
             ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)
@@ -142,13 +143,15 @@
 
       $.getJSON("http://gnm41162:8888/?ignore=type,tone&ignore-section-tags=true&callback=?", function(data) {
             for (var i in data.nodes) {
-                 sys.addNode(data.nodes[i].id, {root:(i == 0), label:data.nodes[i].webTitle, links:data.nodes[i].links});                
+                var links = data.nodes[i].links.length;                
+                sys.addNode(data.nodes[i].id, {root:(i == 0), weight:links, label:data.nodes[i].webTitle, links:data.nodes[i].links});                
                 for (var l in data.nodes[i].links) {
                     var node = sys.getNode(data.nodes[i].links[l].id);
                     if (node) {
                         sys.addEdge(data.nodes[i].id, node, {length: data.nodes[i].links[l].length});
-                    }                    
+                    }
                 }
+                
             }
       });
   })
